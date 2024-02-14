@@ -40,6 +40,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Run Ansible Playbook') {
+                    steps {
+                        script {
+                            ansiblePlaybook(
+                                playbook: 'calculatorDeploy.yml',
+                                inventory: 'inventory'
+                             )
+                        }
+                    }
+                }
+
         stage('Logout from Dockerhub') {
             steps {
                 sh 'docker logout'
