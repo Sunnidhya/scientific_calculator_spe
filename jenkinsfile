@@ -52,12 +52,12 @@ pipeline {
             }
         }
 
-   stage('Run Ansible Playbook') {
+    stage('Run Ansible Playbook') {
             steps {
                 script {
                     sh 'export LANG=en_US.UTF-8'
                     sh 'export LC_ALL=en_US.UTF-8'
-                    sh 'echo 375faea37d5a4924a1e83bc6a0231734 | sudo -S localectl set-locale LANG=en_US.UTF-8'
+                    sh 'echo "375faea37d5a4924a1e83bc6a0231734" | sudo -S localectl set-locale LANG=en_US.UTF-8'
                     ansiblePlaybook(
                         playbook: 'calculatorDeploy.yml',
                         inventory: 'inventory'
