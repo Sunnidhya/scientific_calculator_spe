@@ -57,7 +57,7 @@ pipeline {
                 script {
                     sh 'export LANG=en_US.UTF-8'
                     sh 'export LC_ALL=en_US.UTF-8'
-                    sh 'sudo localectl set-locale LANG=en_US.UTF-8'
+                    sh 'echo 16031996 | sudo -S localectl set-locale LANG=en_US.UTF-8'
                     ansiblePlaybook(
                         playbook: 'calculatorDeploy.yml',
                         inventory: 'inventory'
