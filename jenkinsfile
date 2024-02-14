@@ -1,67 +1,138 @@
 pipeline {
     agent any
+
     environment {
-        GIT_REPO_URL = "https://github.com/Sunnidhya/scientific_calculator_spe.git"
-        DOCKER_IMAGE_NAME = "roysun96/scientific_calculator_spe"
-        DOCKERHUB_USERNAME = "roysun96"
-        DOCKERHUB_PASSWORD = "Sr@16031996"
-        ANSIBLE_PLAYBOOK_PATH = "calculatorDeploy.yml"
+        DOCKER_IMAGE_NAME = 'sci-calculator'
+        GITHUB_REPO_URL = 'https://github.com/Sunnidhya/scientific_calculator_spe.git'
+        DOCKERHUB_USERNAME = 'roysun96'
+        DOCKERHUB_PASSWORD = 'Sr@16031996'
     }
+
     stages {
-        stage('Pull from Git') {
+        stage('Checkout from Github') {
             steps {
-                git branch: 'main', url: "${env.GIT_REPO_URL}"
+                script {
+                    // Checkout the code from the GitHub repository
+                    git branch: 'main', url: "${GITHUB_REPO_URL}"
+                }
             }
         }
+
         stage('Maven Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
-        stage('Build Docker Image') {
+                    steps {
+                        sh 'mvn clean install'
+                    }
+                }
+
+        stage('Building the Docker Image') {
             steps {
                 script {
-                    def dockerImageName = "${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    sh "docker build -t ${dockerImageName} ."
+                    // Build Docker image
+                    docker.build("${DOCKER_IMAGE_NAME}", '.')
                 }
             }
         }
+
         stage('Login to Dockerhub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: '9b7ac77c-7690-46fb-8dfe-7191e22fed4c', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
-                    sh "docker login -u ${env.DOCKERHUB_USERNAME} -p ${env.DOCKERHUB_PASSWORD}"
+                    steps {
+                        withCredentials([usernamePassword(credentialsId: 'DockerHubCred', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
+                            sh "docker login -u ${env.DOCKERHUB_USERNAME} -p ${env.DOCKERHUB_PASSWORD}"
+                        }
+                    }
                 }
+
+        stage('Pushing the Docker Image') {
+            steps {
+                script{
+                    docker.withRegistry('', 'DockerHubCred') {
+                    sh 'docker tag sci-calculator roysun96/scientific_calculator_spe:latest'
+                    sh 'docker push roysun96/scientific_calculator_spe'
+                    }
+                 }
             }
         }
-        stage('Push Docker Image') {
+
+   stage('Run Ansible Playbook') {
             steps {
                 script {
-                    def dockerImageName = "${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    sh "docker push ${dockerImageName}"
+                    ansiblePlaybook(
+                        playbook: 'calculatorDeploy.yml',
+                        inventory: 'inventory'
+                     )
                 }
             }
         }
-        stage('Deploy with Ansible') {
-        steps {
-        sh "ansible-pull -U ${env.ANSIBLE_PLAYBOOK_PATH}" }
-        }
 
-
-//         stage('Run Ansible Playbook') {
-//                     steps {
-//                         script {
-//                             ansiblePlaybook(
-//                                 playbook: 'calculatorDeploy.yml',
-//                                 inventory: 'inventory'
-//                              )
-//                         }
-//                     }
-//                 }
-
-        stage('Logout from Dockerhub') {
-            steps {
-                sh 'docker logout'
-            }
-        }
     }
 }
+
+
+
+
+// pipeline {
+//     agent any
+//     environment {
+//         GIT_REPO_URL = "https://github.com/Sunnidhya/scientific_calculator_spe.git"
+//         DOCKER_IMAGE_NAME = "roysun96/scientific_calculator_spe"
+//         DOCKERHUB_USERNAME = "roysun96"
+//         DOCKERHUB_PASSWORD = "Sr@16031996"
+//         ANSIBLE_PLAYBOOK_PATH = "calculatorDeploy.yml"
+//     }
+//     stages {
+//         stage('Pull from Git') {
+//             steps {
+//                 git branch: 'main', url: "${env.GIT_REPO_URL}"
+//             }
+//         }
+//         stage('Maven Build') {
+//             steps {
+//                 sh 'mvn clean install'
+//             }
+//         }
+//         stage('Build Docker Image') {
+//             steps {
+//                 script {
+//                     def dockerImageName = "${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}"
+//                     sh "docker build -t ${dockerImageName} ."
+//                 }
+//             }
+//         }
+//         stage('Login to Dockerhub') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: '9b7ac77c-7690-46fb-8dfe-7191e22fed4c', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
+//                     sh "docker login -u ${env.DOCKERHUB_USERNAME} -p ${env.DOCKERHUB_PASSWORD}"
+//                 }
+//             }
+//         }
+//         stage('Push Docker Image') {
+//             steps {
+//                 script {
+//                     def dockerImageName = "${env.DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}"
+//                     sh "docker push ${dockerImageName}"
+//                 }
+//             }
+//         }
+//         stage('Deploy with Ansible') {
+//         steps {
+//         sh "ansible-pull -U ${env.ANSIBLE_PLAYBOOK_PATH}" }
+//         }
+//
+//
+// //         stage('Run Ansible Playbook') {
+// //                     steps {
+// //                         script {
+// //                             ansiblePlaybook(
+// //                                 playbook: 'calculatorDeploy.yml',
+// //                                 inventory: 'inventory'
+// //                              )
+// //                         }
+// //                     }
+// //                 }
+//
+//         stage('Logout from Dockerhub') {
+//             steps {
+//                 sh 'docker logout'
+//             }
+//         }
+//     }
+// }
