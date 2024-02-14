@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE_NAME = "roysun96/scientific_calculator_spe"
         DOCKERHUB_USERNAME = "roysun96"
         DOCKERHUB_PASSWORD = "Sr@16031996"
+        ANSIBLE_PLAYBOOK_PATH = "calculatorDeploy.yml"
     }
     stages {
         stage('Pull from Git') {
@@ -40,17 +41,22 @@ pipeline {
                 }
             }
         }
+        stage('Deploy with Ansible') {
+        steps {
+        sh "ansible-pull -U ${env.ANSIBLE_PLAYBOOK_PATH}" }
+        }
 
-        stage('Run Ansible Playbook') {
-                    steps {
-                        script {
-                            ansiblePlaybook(
-                                playbook: 'calculatorDeploy.yml',
-                                inventory: 'inventory'
-                             )
-                        }
-                    }
-                }
+
+//         stage('Run Ansible Playbook') {
+//                     steps {
+//                         script {
+//                             ansiblePlaybook(
+//                                 playbook: 'calculatorDeploy.yml',
+//                                 inventory: 'inventory'
+//                              )
+//                         }
+//                     }
+//                 }
 
         stage('Logout from Dockerhub') {
             steps {
