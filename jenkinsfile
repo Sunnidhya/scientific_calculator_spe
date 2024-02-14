@@ -55,7 +55,7 @@ pipeline {
     stage('Run Ansible Playbook') {
             steps {
                 script {
-                    sh 'echo "localectl set-locale LANG=en_US.UTF-8'
+                    sh 'echo localectl set-locale LANG=en_US.UTF-8'
                     ansiblePlaybook(
                         playbook: 'calculatorDeploy.yml',
                         inventory: 'inventory'
