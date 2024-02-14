@@ -55,6 +55,8 @@ pipeline {
    stage('Run Ansible Playbook') {
             steps {
                 script {
+                    sh 'export LANG=en_US.UTF-8'
+                    sh 'export LC_ALL=en_US.UTF-8'
                     ansiblePlaybook(
                         playbook: 'calculatorDeploy.yml',
                         inventory: 'inventory'
