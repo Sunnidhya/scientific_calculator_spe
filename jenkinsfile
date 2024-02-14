@@ -6,6 +6,8 @@ pipeline {
         GITHUB_REPO_URL = 'https://github.com/Sunnidhya/scientific_calculator_spe.git'
         DOCKERHUB_USERNAME = 'roysun96'
         DOCKERHUB_PASSWORD = 'Sr@16031996'
+        LANG = 'en_US.UTF-8'
+        LC_ALL = 'en_US.UTF-8'
     }
 
     stages {
@@ -55,7 +57,7 @@ pipeline {
     stage('Run Ansible Playbook') {
             steps {
                 script {
-                    sh 'localectl set-locale LANG=en_US.UTF-8'
+//                     sh 'localectl set-locale LANG=en_US.UTF-8'
                     ansiblePlaybook(
                         playbook: 'calculatorDeploy.yml',
                         inventory: 'inventory'
