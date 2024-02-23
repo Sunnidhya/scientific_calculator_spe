@@ -62,26 +62,4 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            mail(
-                replyTo: 'roy.sunnidhya96@gmail.com',
-                subject: "Build Info",
-                body: """\
-                    <html>
-                      <body>
-                          <h1>${env.JOB_NAME}</h1>
-                          
-                          <p><b>Build Result:</b> ${currentBuild.result}</p>
-                          
-                          <p><b>Duration:</b> ${currentBuild.duration / 60} minutes</p>
-                          
-                          <p><a href="${currentBuild.artifactPath ?: currentBuild.rawArtifact}'">View Artifacts</a></p>
-                       </body>
-                    </html>
-                    """,
-                mimeType: 'text/html; charset=UTF-8'
-            )
-        }
-    }
 }
