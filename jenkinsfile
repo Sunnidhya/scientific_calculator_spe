@@ -65,7 +65,7 @@ pipeline {
     post {
         always {
             mail(
-                recipients: 'roy.sunnidhya96@gmail.com',
+                replyTo: 'roy.sunnidhya96@gmail.com',
                 subject: "Build Info",
                 body: """\
                     <html>
@@ -80,8 +80,7 @@ pipeline {
                        </body>
                     </html>
                     """,
-                sendToDevelopers: true,
-                contentType: 'text/html; charset=UTF-8'
+                mimeType: 'text/html; charset=UTF-8'
             )
         }
     }
