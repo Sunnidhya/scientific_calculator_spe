@@ -62,4 +62,9 @@ pipeline {
             }
         }
     }
+    post{
+        always{
+            mail(emailext body: 'Build Status Changes', subject: 'Build Info', to: 'roy.sunnidhya96@gmail.com')
+        }
+    }
 }
